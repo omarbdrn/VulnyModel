@@ -1,0 +1,1507 @@
+functionSource,CWE-other,combine
+"gwy_resource_class_mkdir(GwyResourceClass *klass)
+{
+    gchar *path;
+    gint ok;
+    
+    g_return_val_if_fail(GWY_IS_RESOURCE_CLASS(klass), FALSE);
+    
+    path = g_build_filename(gwy_get_user_dir(), klass->name, NULL);
+    if (g_file_test(path, G_FILE_TEST_IS_DIR)) {
+        g_free(path);
+        return TRUE;
+    }
+
+    ok = !g_mkdir(path, 0700);
+    g_free(path);
+    return ok;
+}",True,True
+"mma8452_show_int_plus_micros(char *buf, const int (*vals)[2], int n)
+{
+    size_t len = 0;
+    while (n-- > 0)
+        len += scnprintf(buf + len, PAGE_SIZE - len, ""%d.%06d "", vals[n][0], vals[n][1]);
+        buf[len - 1] = '\n';
+        return len;
+}	",False,False
+"#include <stdio.h>
+
+int main(int argc, char **argv)
+{
+  volatile int important_data = 0;
+  char user_input[10];
+
+  gets(user_input);
+
+  if(important_data != 0) {
+    printf(""Warning !!!, the 'important_data' was changed\n"");
+  } else {
+    printf(""the 'important_data' was not changed\n"");
+  }
+}",True,True
+"#include <iostream>
+#include <string>
+using namespace std;
+
+int main()
+{
+    string str;
+    cout << ""Please enter your string: \n"";
+    getline(cin, str);
+    unsigned int len = str.length();
+    if (len > -1)
+    {
+    cout << ""string length is "" << len << ""which is bigger than -1 "" <<std::endl;
+    }else 
+    {
+    cout << ""string length is "" << len << "" which is less than -1 "" <<std::endl;
+    }
+    return 0;
+}",True,True
+"nresp = packet_get_int();
+if (nresp > 0) {
+response = xmalloc(nresp*sizeof(char*));
+for (i = 0; i < nresp; i++) 
+    response[i] = packet_get_string(NULL);
+}",True,True
+"#include <stdio.h>
+
+/*
+Example of an integer overflow.
+
+To compile (with Visual Studio):
+cl /MT /GS- integer_overflow_example.c
+*/
+
+#define MAX_DATA_SIZE 255
+#define DATA_SIZE 1000
+
+// This struct represents a file or a network packet
+struct MockedFile {
+  char size[MAX_DATA_SIZE];
+  char* data;
+};
+
+// Prepares the fake file
+void MockFileFormat(struct MockedFile* mock) {
+  char size[1];
+  size[0] = DATA_SIZE;
+
+  char* data = (char*) malloc(DATA_SIZE);
+  memset(data, 'A', DATA_SIZE);
+
+  memcpy(mock->size, size, 1);
+  mock->data = data;
+}
+
+int main(int args, char** argv) {
+  // Pretend this gives us the fake file (or a network packet)
+  struct MockedFile mock;
+  MockFileFormat(&mock);
+
+  // The size field is copied to a one-byte buffer
+  char sizeBuf[1];
+  memcpy(sizeBuf, mock.size, 1);
+
+  // char by default is signed, which means this check can only
+  // handle range between -128 to 127, and may result an integer
+  // overflow
+  char size = sizeBuf[0];
+  printf(""Data size is %d\n"", size);
+  if (size < MAX_DATA_SIZE) {
+    char buffer[MAX_DATA_SIZE];
+    memset(buffer, '\0', MAX_DATA_SIZE);
+    memcpy(buffer, mock.data, size);
+    printf(""%s\n"", buffer);
+  }
+
+  return 0;
+}",True,True
+"/*
+Author: Hardik Shah
+Email: hardik05@gmail.com
+Web: http://hardik05.wordpress.com
+*/
+
+//a c program to test common types values
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <float.h>
+
+int main(int argc, char** argv) {
+    printf(""--------------------------------------------------\n"");
+    printf(""CHAR_BIT    :   %d\n"", CHAR_BIT);
+    printf(""CHAR_MAX    :   %d\n"", CHAR_MAX);
+    printf(""CHAR_MIN    :   %d\n"", CHAR_MIN);
+    printf(""INT_MAX     :   %d\n"", INT_MAX);
+    printf(""INT_MIN     :   %d\n"", INT_MIN);
+    printf(""LONG_MAX    :   %ld\n"", (long)LONG_MAX);
+    printf(""LONG_MIN    :   %ld\n"", (long)LONG_MIN);
+    printf(""SCHAR_MAX   :   %d\n"", SCHAR_MAX);
+    printf(""SCHAR_MIN   :   %d\n"", SCHAR_MIN);
+    printf(""SHRT_MAX    :   %d\n"", SHRT_MAX);
+    printf(""SHRT_MIN    :   %d\n"", SHRT_MIN);
+    printf(""UCHAR_MAX   :   %d\n"", UCHAR_MAX);
+    printf(""UINT_MAX    :   %u\n"", (unsigned int)UINT_MAX);
+    printf(""ULONG_MAX   :   %lu\n"", (unsigned long)ULONG_MAX);
+    printf(""USHRT_MAX   :   %d\n"", (unsigned short)USHRT_MAX);
+    printf(""--------------------------------------------------\n"");
+    printf(""Storage size for float : %d \n"", sizeof(float));
+    printf(""FLT_MAX     :   %g\n"", (float)FLT_MAX);
+    printf(""FLT_MIN     :   %g\n"", (float)FLT_MIN);
+    printf(""-FLT_MAX    :   %g\n"", (float)-FLT_MAX);
+    printf(""-FLT_MIN    :   %g\n"", (float)-FLT_MIN);
+    printf(""DBL_MAX     :   %g\n"", (double)DBL_MAX);
+    printf(""DBL_MIN     :   %g\n"", (double)DBL_MIN);
+    printf(""-DBL_MAX     :  %g\n"", (double)-DBL_MAX);
+    printf(""Precision value: %d\n"", FLT_DIG);
+    printf(""--------------------------------------------------\n"");
+
+    //printf(""value: %d\n"", INT_MIN);
+    //printf(""value: %d\n"", INT_MAX);
+    printf(""INT_MAX+1=: %d\n"", INT_MAX + 1);
+    printf(""INT_MIN-1=: %d\n"", INT_MIN -1);
+    return 0;
+}",False,False
+"/*
+Author: Hardik Shah
+Email: hardik05@gmail.com
+Web: http://hardik05.wordpress.com
+*/
+
+//a vulnerable c program to explain common vulnerability types
+//fuzz with AFL
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+struct Image
+{
+	char header[4];
+	int width;
+	int height;
+	char data[10];
+};
+
+void stack_operation(){
+	char buff[0x1000];
+	while(1){
+		stack_operation();
+	}
+}
+
+int ProcessImage(char* filename){
+	FILE *fp;
+	struct Image img;
+
+	fp = fopen(filename,""r"");            //Statement   1
+
+	if(fp == NULL)
+	{
+		printf(""\nCan't open file or file doesn't exist.\r\n"");
+		exit(0);
+	}
+
+
+	while(fread(&img,sizeof(img),1,fp)>0)
+	{
+		//if(strcmp(img.header,""IMG"")==0)
+		//{
+			printf(""\n\tHeader\twidth\theight\tdata\t\r\n"");
+
+			printf(""\n\t%s\t%d\t%d\t%s\r\n"",img.header,img.width,img.height,img.data);
+
+
+			//integer overflow 0x7FFFFFFF+1=0
+			//0x7FFFFFFF+2 = 1
+			//will cause very large/small memory allocation.
+			int size1 = img.width + img.height;
+			char* buff1=(char*)malloc(size1);
+
+			//heap buffer overflow
+			memcpy(buff1,img.data,sizeof(img.data));
+			free(buff1);
+			//double free	
+			if (size1/2==0){
+				free(buff1);
+			}
+			else{
+				//use after free
+				if(size1/3 == 0){
+					buff1[0]='a';
+				}
+			}
+
+
+			//integer underflow 0-1=-1
+			//negative so will cause very large memory allocation
+			int size2 = img.width - img.height+100;
+			//printf(""Size1:%d"",size1);
+			char* buff2=(char*)malloc(size2);
+
+			//heap buffer overflow
+			memcpy(buff2,img.data,sizeof(img.data));
+
+			//divide by zero
+			int size3= img.width/img.height;
+			//printf(""Size2:%d"",size3);
+
+			char buff3[10];
+			char* buff4 =(char*)malloc(size3);
+			memcpy(buff4,img.data,sizeof(img.data));
+
+			//OOBR read bytes past stack/heap buffer
+			char OOBR = buff3[size3];
+			char OOBR_heap = buff4[size3];
+
+			//OOBW write bytes past stack/heap buffer
+			buff3[size3]='c';
+			buff4[size3]='c';
+
+			if(size3>10){
+				//memory leak here
+				buff4=0;
+			}
+			else{
+				free(buff4);
+			}
+			int size4 = img.width * img.height;
+			if(size4/2==0){
+				//stack exhaustion here
+				stack_operation();
+			}
+			else{
+				//heap exhaustion here
+				char *buff5;
+				do{
+				buff5 = (char*)malloc(size4);
+				}while(buff5);
+			}
+			free(buff2);
+		//}
+		//else
+		//	printf(""invalid header\r\n"");
+
+	}
+	fclose(fp);
+	return 0;
+}
+
+int main(int argc,char **argv)
+{
+	if (argc < 2) {
+    		fprintf(stderr, ""no input file\n"");
+    		exit(-1);
+  	}
+	ProcessImage(argv[1]);
+	return 0;
+}
+",True,True
+"/*
+Author: Hardik Shah
+Email: hardik05@gmail.com
+Web: http://hardik05.wordpress.com
+*/
+
+//a vulnerable c program to explain common vulnerability types
+//fuzz with AFL
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+struct Image
+{
+	char header[4];
+	int width;
+	int height;
+	char data[10];
+};
+
+
+int ProcessImage(char* filename){
+
+	FILE *fp;
+	char ch;
+	struct Image img;
+
+	fp = fopen(filename,""r"");            //Statement   1
+
+	if(fp == NULL)
+	{
+		printf(""\nCan't open file or file doesn't exist.\r\n"");
+		exit(0);
+	}
+
+
+	while(fread(&img,sizeof(img),1,fp)>0)
+	{
+		//if(strcmp(img.header,""IMG"")==0)
+		//{
+		printf(""\n\tHeader\twidth\theight\tdata\t\r\n"");
+
+		printf(""\n\t%s\t%d\t%d\t%s\r\n"",img.header,img.width,img.height,img.data);
+
+
+		//integer overflow 0x7FFFFFFF+1=0
+		//0x7FFFFFFF+2 = 1
+		//will cause very large/small memory allocation.
+		int size1 = img.width + img.height;
+		char *buff1;
+		if(size1/2==0){
+			do{
+				buff1=(char*)malloc(size1);
+			}while(buff1);
+		}
+	}
+	return 0;
+	}
+
+	int main(int argc,char **argv)
+	{
+		ProcessImage(argv[1]);
+		return 0;
+	}
+",True,True
+"/*
+Author: Hardik Shah
+Email: hardik05@gmail.com
+Web: http://hardik05.wordpress.com
+*/
+
+//a vulnerable C program to explain common vulnerability types
+//fuzz with libfuzzer
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<stdint.h>
+struct Image
+{
+	char header[4];
+	int width;
+	int height;
+	char data[10];
+};
+
+int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size){
+if(size<=12){
+return 0;
+}
+	struct Image *img;
+	img = (struct Image*)data;
+		//integer overflow 0x7FFFFFFF+1=0
+		//0x7FFFFFFF+2 = 1
+		//will cause very large/small memory allocation.
+		int size1 = img->width + img->height;
+		char* buff1=(char*)malloc(size1);
+
+		//heap buffer overflow
+		memcpy(buff1,img->data,sizeof(img->data));
+		free(buff1);
+		//double free	
+		if (size1/3==0){
+			free(buff1);
+		}
+		else{
+			//use after free
+			if(size1/20 == 0){
+				buff1[0]='a';
+			}
+		}
+
+
+		//integer underflow 0-1=-1
+		//negative so will cause very large memory allocation
+		int size2 = img->width - img->height+100;
+		//printf(""Size1:%d"",size1);
+		char* buff2=(char*)malloc(size2);
+
+		//heap buffer overflow
+		memcpy(buff2,img->data,sizeof(img->data));
+
+		//divide by zero
+		int size3= img->width/img->height;
+		//printf(""Size2:%d"",size3);
+
+		char buff3[10];
+		char* buff4 =(char*)malloc(size3);
+		memcpy(buff4,img->data,sizeof(img->data));
+
+		//stack OOBR read bytes past buffer
+		char OOBR_stack = buff3[size3];
+
+		char OOBR_heap = buff4[size1];
+
+		//stack OOBW write bytes past buffer
+		buff3[size3]='c';
+		buff4[size1]='c';
+
+		if(size3/5==0){
+			//memory leak here
+			buff4=0;
+		}
+		else{
+			free(buff4);
+		}
+
+		free(buff2);
+
+
+}
+
+",True,True
+"/*
+Author: Hardik Shah
+Email: hardik05@gmail.com
+Web: http://hardik05.wordpress.com
+*/
+
+//a vulnerable c program to explain common vulnerability types
+//fuzz with AFL
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+struct Image
+{
+	char header[4];
+	unsigned int width;
+	unsigned int height;
+	char data[10];
+};
+
+int ProcessImage(char* filename){
+	FILE *fp;
+	char ch;
+	struct Image img;
+
+	fp = fopen(filename,""r"");            //Statement   1
+
+	if(fp == NULL)
+	{
+		printf(""\nCan't open file or file doesn't exist.\r\n"");
+		exit(0);
+	}
+
+
+	while(fread(&img,sizeof(img),1,fp)>0)
+	{
+		//if(strcmp(img.header,""IMG"")==0)
+		//{
+		printf(""\n\tHeader\twidth\theight\tdata\t\r\n"");
+
+		printf(""\n\t%s\t%d\t%d\t%s\r\n"",img.header,img.width,img.height,img.data);
+
+
+		//integer overflow 0x7FFFFFFF+1=0
+		//0x7FFFFFFF+2 = 1
+		//will cause very large/small memory allocation.
+		unsigned int size1 = img.width + img.height;
+		if(size1>0xFFFF)
+		{
+			printf(""Error!Large value of size1 detected!"");
+			return 0;
+		}
+
+		char* buff1=(char*)malloc(size1);
+		if(buff1==NULL)
+		{
+			printf(""error! buffer alocation failed!"");
+			return 0;
+		}
+		if(sizeof(img.data)> size1)
+		{
+			printf(""Error!, not eough memory to copy data"");
+			return 0;
+		}
+		//heap buffer overflow
+		memcpy(buff1,img.data,sizeof(img.data));
+		free(buff1);
+		buff1=NULL;
+
+		//double free	
+		if (size1/2==0){
+			free(buff1);
+		}
+		else{
+			//use after free
+			if(size1/3 == 0){
+				if(buff1==NULL){
+					printf(""Error! Buffer is already freed!"");
+						return 0;
+
+				}
+				else
+				{
+					buff1[0]='a';
+				}
+			}
+		}
+
+
+		//integer underflow 0-1=-1
+		//negative so will cause very large memory allocation
+		unsigned int size2 = img.width - img.height+100;
+		//printf(""Size1:%d"",size1);
+		char* buff2=(char*)malloc(size2);
+		if(buff2==NULL)
+		{
+			printf(""Error! Memory allocation failed!"");
+			return 0;
+		}
+		if(sizeof(img.data)>size2)
+		{
+			printf(""Errr!, not enugh emmory to copy data!"");
+			return 0;
+		}
+
+		//heap buffer overflow
+		memcpy(buff2,img.data,sizeof(img.data));
+
+		//divide by zero
+		if(img.height==0)
+		{
+			printf(""Error! Image Height is zero!"");
+			return 0;
+		}
+
+		int size3= img.width/img.height;
+		//printf(""Size2:%d"",size3);
+
+		char buff3[10];
+		char* buff4 =(char*)malloc(size3);
+		if(buff4==NULL)
+		{
+			printf(""Error!, Memory allocation failed."");
+			return 0;
+		}
+		if(sizeof(img.data) >size3){
+			printf(""Error!, not enouggh memoy to copy data!"");
+			return 0;
+		}
+		memcpy(buff4,img.data,sizeof(img.data));
+
+		//OOBR read bytes past stack/heap buffer
+		if(size3>9)
+		{
+			printf(""Error! memory acess beynd allowed size detected!"");
+			return 0;
+		}
+
+		else
+		{
+			char OOBR = buff3[size3];
+			buff3[size3]='c';
+
+		}
+		int size4 = size3+100;
+		if(size4> size3)
+		{
+			printf(""Error! memory acess beyond alowed size detected!"");
+			return 0;
+		}
+		else
+		{
+			char OOBR_heap = buff4[size4];
+			buff4[size4]='c';
+
+		}
+
+		//OOBW write bytes past stack/heap buffer
+
+		if(size3>10){
+			//memory leak here
+			free(buff4);
+			buff4=0;
+		}
+		else{
+			free(buff4);
+		}
+
+		free(buff2);
+		//}
+		//else
+		//	printf(""invalid header\r\n"");
+
+	}
+	fclose(fp);
+
+	return 0;
+}
+
+int main(int argc,char **argv)
+{
+	ProcessImage(argv[1]);
+
+}
+",True,True
+"/*
+Author: Hardik Shah
+Email: hardik05@gmail.com
+Web: http://hardik05.wordpress.com
+https://www.geeksforgeeks.org/socket-programming-cc/
+*/
+
+//a vulnerable c program to explain common vulnerability types
+//fuzz with AFL
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include<unistd.h>	//write
+
+#include<pthread.h> //for threading , link with lpthread
+
+//structure which holds our data
+struct Image
+{
+	char header[4];
+	int width;
+	int height;
+	char data[10];
+};
+int ProcessImage(char *buffer, size_t size);
+
+int SetupServer(){
+	int server_fd, new_socket, valread;
+	struct sockaddr_in address;
+	int opt = 1;
+	int addrlen = sizeof(address);
+	char buffer[1024] = {0};
+	char *hello = ""Hello from server"";
+
+	// Creating socket file descriptor
+	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+	{
+		perror(""socket failed"");
+		exit(EXIT_FAILURE);
+	}
+
+	// Forcefully attaching socket to the port 8080
+	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT,
+				&opt, sizeof(opt)))
+	{
+		perror(""setsockopt"");
+		exit(EXIT_FAILURE);
+	}
+	address.sin_family = AF_INET;
+	address.sin_addr.s_addr = INADDR_ANY;
+	address.sin_port = htons( 31337 );
+
+	// Forcefully attaching socket to the port 8080
+	if (bind(server_fd, (struct sockaddr *)&address, 
+				sizeof(address))<0)
+	{
+		perror(""bind failed"");
+		exit(EXIT_FAILURE);
+	}
+	if (listen(server_fd, 3) < 0)
+	{
+		perror(""listen"");
+		exit(EXIT_FAILURE);
+	}
+	if ((new_socket = accept(server_fd, (struct sockaddr *)&address, 
+					(socklen_t*)&addrlen))<0)
+	{
+		perror(""accept"");
+		exit(EXIT_FAILURE);
+	}
+	valread = read( new_socket , buffer, 1024);
+	printf(""%s\n"",buffer );
+	ProcessImage(buffer,valread);
+	return 0;
+}
+
+int ProcessImage(char* buffer, size_t size){
+	if(size<=12){
+		return 0;
+	}
+
+	struct Image *img;
+	img = (struct Image*)buffer;
+
+
+
+	printf(""\n\tHeader\twidth\theight\tdata\t\r\n"");
+
+	printf(""\n\t%s\t%d\t%d\t%s\r\n"",img->header,img->width,img->height,img->data);
+
+
+	//integer overflow 0x7FFFFFFF+1=0
+	//0x7FFFFFFF+2 = 1
+	//will cause very large/small memory allocation.
+	int size1 = img->width + img->height;
+	char* buff1=(char*)malloc(size1);
+
+	//heap buffer overflow
+	memcpy(buff1,img->data,sizeof(img->data));
+	free(buff1);
+	//double free	
+	if (size1/2==0){
+		free(buff1);
+	}
+	else{
+		//use after free
+		if(size1/3 == 0){
+			buff1[0]='a';
+		}
+	}
+
+
+	//integer underflow 0-1=-1
+	//negative so will cause very large memory allocation
+	int size2 = img->width - img->height+100;
+	//printf(""Size1:%d"",size1);
+	char* buff2=(char*)malloc(size2);
+
+	//heap buffer overflow
+	memcpy(buff2,img->data,sizeof(img->data));
+
+	//divide by zero
+	int size3= img->width/img->height;
+	//printf(""Size2:%d"",size3);
+
+	char buff3[10];
+	char* buff4 =(char*)malloc(size3);
+	memcpy(buff4,img->data,sizeof(img->data));
+
+	//OOBR read bytes past stack/heap buffer
+	char OOBR = buff3[size3];
+	char OOBR_heap = buff4[size3];
+
+	//OOBW write bytes past stack/heap buffer
+	buff3[size3]='c';
+	buff4[size3]='c';
+
+	if(size3>10){
+		//memory leak here
+		buff4=0;
+	}
+	else{
+		free(buff4);
+	}
+
+	free(buff2);
+
+return 0;
+}
+
+int main(int argc,char **argv)
+{
+	//ProcessImage(argv[1]);
+	SetupServer();
+
+}
+",True,True
+"/*
+Author: Hardik Shah
+Email: hardik05@gmail.com
+Web: http://hardik05.wordpress.com
+*/
+
+//a vulnerable c program to explain common vulnerability types
+//fuzz with AFL
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+struct Image
+{
+char header[4];
+int width;
+int height;
+char data[10];
+};
+
+void stack_operation(){
+		char buff[0x1000];
+		while(1)
+			stack_operation(); //recusively call function and allocate stack memory
+	}
+
+int ProcessImage(char* filename){
+
+	FILE *fp;
+	char ch;
+	struct Image img;
+
+	fp = fopen(filename,""r"");            //Statement   1
+
+	if(fp == NULL)
+	{
+		printf(""\nCan't open file or file doesn't exist.\r\n"");
+		exit(0);
+	}
+
+
+	while(fread(&img,sizeof(img),1,fp)>0)
+	{
+		//if(strcmp(img.header,""IMG"")==0)
+		//{
+		printf(""\n\tHeader\twidth\theight\tdata\t\r\n"");
+
+		printf(""\n\t%s\t%d\t%d\t%s\r\n"",img.header,img.width,img.height,img.data);
+
+
+		//integer overflow 0x7FFFFFFF+1=0
+		//0x7FFFFFFF+2 = 1
+		//will cause very large/small memory allocation.
+		int size1 = img.width + img.height;
+		char *buff1;
+		if(size1/2==0){
+			do{
+				buff1=(char*)malloc(size1);
+			}while(buff1);
+		}
+		else{
+			stack_operation();
+		}
+
+	}
+	return 0;
+	}
+
+	int main(int argc,char **argv)
+	{
+		ProcessImage(argv[1]);
+		return 0;
+	}
+",True,True
+"#include ""imgReadlib.h""
+
+int main(int argc, char **argv)
+{
+	ProcessImage(argv[1]);
+	return 0;
+}
+
+",False,False
+"/*
+Author: Hardik Shah
+Email: hardik05@gmail.com
+Web: http://hardik05.wordpress.com
+*/
+
+//a vulnerable c program to explain common vulnerability types
+//fuzz with AFL
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+struct Image
+{
+	char header[4];
+	int width;
+	int height;
+	char data[10];
+};
+
+void stack_operation(){
+	char buff[0x1000];
+	while(1){
+		stack_operation();
+	}
+}
+
+int ProcessImage(char* filename){
+	FILE *fp;
+	struct Image img;
+
+	fp = fopen(filename,""r"");            //Statement   1
+
+	if(fp == NULL)
+	{
+		printf(""\nCan't open file or file doesn't exist.\r\n"");
+		exit(0);
+	}
+
+
+	while(fread(&img,sizeof(img),1,fp)>0)
+	{
+		//if(strcmp(img.header,""IMG"")==0)
+		//{
+			printf(""\n\tHeader\twidth\theight\tdata\t\r\n"");
+
+			printf(""\n\t%s\t%d\t%d\t%s\r\n"",img.header,img.width,img.height,img.data);
+
+
+			//integer overflow 0x7FFFFFFF+1=0
+			//0x7FFFFFFF+2 = 1
+			//will cause very large/small memory allocation.
+			int size1 = img.width + img.height;
+			char* buff1=(char*)malloc(size1);
+
+			//heap buffer overflow
+			memcpy(buff1,img.data,sizeof(img.data));
+			free(buff1);
+			//double free	
+			if (size1/2==0){
+				free(buff1);
+			}
+			else{
+				//use after free
+				if(size1/3 == 0){
+					buff1[0]='a';
+				}
+			}
+
+
+			//integer underflow 0-1=-1
+			//negative so will cause very large memory allocation
+			int size2 = img.width - img.height+100;
+			//printf(""Size1:%d"",size1);
+			char* buff2=(char*)malloc(size2);
+
+			//heap buffer overflow
+			memcpy(buff2,img.data,sizeof(img.data));
+
+			//divide by zero
+			int size3= img.width/img.height;
+			//printf(""Size2:%d"",size3);
+
+			char buff3[10];
+			char* buff4 =(char*)malloc(size3);
+			memcpy(buff4,img.data,sizeof(img.data));
+
+			//OOBR read bytes past stack/heap buffer
+			char OOBR = buff3[size3];
+			char OOBR_heap = buff4[size3];
+
+			//OOBW write bytes past stack/heap buffer
+			buff3[size3]='c';
+			buff4[size3]='c';
+
+			if(size3>10){
+				//memory leak here
+				buff4=0;
+			}
+			else{
+				free(buff4);
+			}
+			int size4 = img.width * img.height;
+			if(size4/2==12){
+				//stack exhaustion here
+				stack_operation();
+			}
+			else{
+				//heap exhaustion here
+				char *buff5;
+				do{
+				buff5 = (char*)malloc(size4);
+				}while(buff5);
+			}
+			free(buff2);
+		//}
+		//else
+		//	printf(""invalid header\r\n"");
+
+	}
+	fclose(fp);
+	return 0;
+}
+",True,True
+"/*
+Author: Hardik Shah
+Email: hardik05@gmail.com
+Web: http://hardik05.wordpress.com
+*/
+
+//a vulnerable c program to explain common vulnerability types
+//fuzz with AFL
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+struct Image
+{
+	char header[4];
+	int width;
+	int height;
+	char data[10];
+};
+
+int ProcessImage(char* filename){
+	FILE *fp;
+	char ch;
+	struct Image img;
+
+	fp = fopen(filename,""r"");            //Statement   1
+
+	if(fp == NULL)
+	{
+		printf(""\nCan't open file or file doesn't exist.\r\n"");
+		exit(0);
+	}
+
+
+	while(fread(&img,sizeof(img),1,fp)>0)
+	{
+		//if(strcmp(img.header,""IMG"")==0)
+		//{
+		printf(""\n\tHeader\twidth\theight\tdata\t\r\n"");
+
+		printf(""\n\t%s\t%d\t%d\t%s\r\n"",img.header,img.width,img.height,img.data);
+
+
+		//integer overflow 0x7FFFFFFF+1=0
+		//0x7FFFFFFF+2 = 1
+		//will cause very large/small memory allocation.
+		int size1 = img.width + img.height;
+		char* buff1=(char*)malloc(size1);
+
+		//heap buffer overflow
+		memcpy(buff1,img.data,sizeof(img.data));
+		free(buff1);
+		//double free	
+		if (size1/2==0){
+			free(buff1);
+		}
+		else{
+			//use after free
+			if(size1/3 == 0){
+				buff1[0]='a';
+			}
+		}
+
+
+		//integer underflow 0-1=-1
+		//negative so will cause very large memory allocation
+		int size2 = img.width - img.height+100;
+		//printf(""Size1:%d"",size1);
+		char* buff2=(char*)malloc(size2);
+
+		//heap buffer overflow
+		memcpy(buff2,img.data,sizeof(img.data));
+
+		//divide by zero
+		int size3= img.width/img.height;
+		//printf(""Size2:%d"",size3);
+
+		char buff3[10];
+		char* buff4 =(char*)malloc(size3);
+		memcpy(buff4,img.data,sizeof(img.data));
+
+		//OOBR read bytes past stack/heap buffer
+		char OOBR = buff3[size3];
+		char OOBR_heap = buff4[size3];
+
+		//OOBW write bytes past stack/heap buffer
+		buff3[size3]='c';
+		buff4[size3]='c';
+
+		if(size3>10){
+			//memory leak here
+			buff4=0;
+		}
+		else{
+			free(buff4);
+		}
+
+		free(buff2);
+		//}
+		//else
+		//	printf(""invalid header\r\n"");
+
+	}
+	fclose(fp);
+
+	return 0;
+}
+
+int main(int argc,char **argv)
+{
+	ProcessImage(argv[1]);
+
+}
+",True,True
+"/*
+Author: Hardik Shah
+Email: hardik05@gmail.com
+Web: http://hardik05.wordpress.com
+*/
+
+//a vulnerable c program to explain common vulnerability types
+//fuzz with AFL
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+//shared memory testcase fuzzing
+__AFL_FUZZ_INIT();
+//end share memory testcase
+
+struct Image
+{
+	char header[4];
+	int width;
+	int height;
+	char data[10];
+};
+
+
+int ProcessImage(char* filename){
+	FILE *fp;
+	char ch;
+	struct Image* img;
+	int bufsize;
+
+	//shared memory data will be inside buff
+	unsigned char *shmem_buf = __AFL_FUZZ_TESTCASE_BUF;
+	bufsize =strlen(shmem_buf); 
+	if(bufsize<=12){
+		return 0;
+	}
+	img = (struct Image*)shmem_buf;
+	printf(""input: %s\n"", shmem_buf);
+
+
+	//integer overflow 0x7FFFFFFF+1=0
+	//0x7FFFFFFF+2 = 1
+	//will cause very large/small memory allocation.
+	int size1 = img->width + img->height;
+	//		printf(""%d"",size1);
+	//		abort();
+	char* buff1=(char*)malloc(size1);
+
+	//heap buffer overflow
+	memcpy(buff1,img->data,sizeof(img->data));
+	free(buff1);
+	//double free	
+	if (size1/3==0){
+		free(buff1);
+	}
+	else{
+		//use after free
+		if(size1/20 == 0){
+			buff1[0]='a';
+		}
+	}
+	//integer underflow 0-1=-1
+	//negative so will cause very large memory allocation
+	int size2 = img->width - img->height+100;
+	//printf(""Size1:%d"",size1);
+	char* buff2=(char*)malloc(size2);
+
+	//heap buffer overflow
+	memcpy(buff2,img->data,sizeof(img->data));
+
+	//divide by zero
+	int size3= img->width/img->height;
+	//printf(""Size2:%d"",size3);
+
+	char buff3[10];
+	char* buff4 =(char*)malloc(size3);
+	memcpy(buff4,img->data,sizeof(img->data));
+
+	//stack OOBR read bytes past buffer
+	char OOBR_stack = buff3[size3];
+
+	char OOBR_heap = buff4[size1];
+
+	//stack OOBW write bytes past buffer
+	buff3[size3]='c';
+	buff4[size1]='c';
+
+	if(size3/5==0){
+		//memory leak here
+		buff4=0;
+	}
+	else{
+		free(buff4);
+	}
+
+	free(buff2);
+
+	return 0;
+}
+
+int main(int argc,char **argv)
+{
+	ProcessImage(argv[1]);
+}
+",True,True
+"/*
+Author: Hardik Shah
+Email: hardik05@gmail.com
+Web: http://hardik05.wordpress.com
+*/
+
+//a vulnerable c program to explain common vulnerability types
+//fuzz with AFL
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+struct Image
+{
+	char header[4];
+	int width;
+	int height;
+	char data[10];
+};
+
+void stack_operation(){
+	char buff[0x1000];
+	while(1){
+		stack_operation();
+	}
+}
+
+int ProcessImage(char* filename){
+	FILE *fp;
+	struct Image img;
+
+	fp = fopen(filename,""r"");            //Statement   1
+
+	if(fp == NULL)
+	{
+		printf(""\nCan't open file or file doesn't exist.\r\n"");
+		exit(0);
+	}
+
+
+	while(fread(&img,sizeof(img),1,fp)>0)
+	{
+		//if(strcmp(img.header,""IMG"")==0)
+		//{
+			printf(""\n\tHeader\twidth\theight\tdata\t\r\n"");
+
+			printf(""\n\t%s\t%d\t%d\t%s\r\n"",img.header,img.width,img.height,img.data);
+
+
+			//integer overflow 0x7FFFFFFF+1=0
+			//0x7FFFFFFF+2 = 1
+			//will cause very large/small memory allocation.
+			int size1 = img.width + img.height;
+			char* buff1=(char*)malloc(size1);
+
+			//heap buffer overflow
+			memcpy(buff1,img.data,sizeof(img.data));
+			free(buff1);
+			//double free	
+			if (size1/2==0){
+				free(buff1);
+			}
+			else{
+				//use after free
+				if(size1/3 == 0){
+					buff1[0]='a';
+				}
+			}
+
+
+			//integer underflow 0-1=-1
+			//negative so will cause very large memory allocation
+			int size2 = img.width - img.height+100;
+			//printf(""Size1:%d"",size1);
+			char* buff2=(char*)malloc(size2);
+
+			//heap buffer overflow
+			memcpy(buff2,img.data,sizeof(img.data));
+
+			//divide by zero
+			int size3= img.width/img.height;
+			//printf(""Size2:%d"",size3);
+
+			char buff3[10];
+			char* buff4 =(char*)malloc(size3);
+			memcpy(buff4,img.data,sizeof(img.data));
+
+			//OOBR read bytes past stack/heap buffer
+			char OOBR = buff3[size3];
+			char OOBR_heap = buff4[size3];
+
+			//OOBW write bytes past stack/heap buffer
+			buff3[size3]='c';
+			buff4[size3]='c';
+
+			if(size3>10){
+				//memory leak here
+				buff4=0;
+			}
+			else{
+				free(buff4);
+			}
+			int size4 = img.width * img.height;
+			if(size4/2==0){
+				//stack exhaustion here
+				stack_operation();
+			}
+			else{
+				//heap exhaustion here
+				char *buff5;
+				do{
+				buff5 = (char*)malloc(size4);
+				}while(buff5);
+			}
+			free(buff2);
+		//}
+		//else
+		//	printf(""invalid header\r\n"");
+
+	}
+	fclose(fp);
+	return 0;
+}
+
+int main(int argc,char **argv)
+{
+	ProcessImage(argv[1]);
+}
+",True,True
+"// dllTest2.cpp : This file contains the 'main' function. Program execution begins and ends there.
+//
+
+#include <iostream>
+#include ""DamnVulnerableHeader.h""
+
+__declspec(noinline) int FuzzMe(char* filename) {
+    //std::cout << ""inside fuzzme function.\n"";
+    ProcessImage(filename);
+    return 0;
+}
+int main(int argc, char** argv)
+{
+    //std::cout << ""inside main function.\n"";
+    FuzzMe(argv[1]);
+    return 0;
+}
+
+// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
+// Debug program: F5 or Debug > Start Debugging menu
+
+// Tips for Getting Started: 
+//   1. Use the Solution Explorer window to add/manage files
+//   2. Use the Team Explorer window to connect to source control
+//   3. Use the Output window to see build output and other messages
+//   4. Use the Error List window to view errors
+//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
+//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+",True,True
+"/*
+Author: Hardik Shah
+Email: hardik05@gmail.com
+Web: http://hardik05.wordpress.com
+*/
+
+//a vulnerable c program to explain common vulnerability types
+//fuzz with AFL
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+struct Image
+{
+	char header[4];
+	int width;
+	int height;
+	char data[10];
+};
+
+int ProcessImage(char* filename){
+	FILE *fp;
+	char ch;
+	struct Image img;
+
+	fp = fopen(filename,""r"");            //Statement   1
+
+	if(fp == NULL)
+	{
+		printf(""\nCan't open file or file doesn't exist.\r\n"");
+		exit(0);
+	}
+
+
+	while(fread(&img,sizeof(img),1,fp)>0)
+	{
+		//if(strcmp(img.header,""IMG"")==0)
+		//{
+		printf(""\n\tHeader\twidth\theight\tdata\t\r\n"");
+
+		printf(""\n\t%s\t%d\t%d\t%s\r\n"",img.header,img.width,img.height,img.data);
+
+
+		//integer overflow 0x7FFFFFFF+1=0
+		//0x7FFFFFFF+2 = 1
+		//will cause very large/small memory allocation.
+		int size1 = img.width + img.height;
+		char* buff1=(char*)malloc(size1);
+
+		//heap buffer overflow
+		memcpy(buff1,img.data,sizeof(img.data));
+		free(buff1);
+		//double free	
+		if (size1/2==0){
+			free(buff1);
+		}
+		else{
+			//use after free
+			if(size1/3 == 0){
+				buff1[0]='a';
+			}
+		}
+
+
+		//integer underflow 0-1=-1
+		//negative so will cause very large memory allocation
+		int size2 = img.width - img.height+100;
+		//printf(""Size1:%d"",size1);
+		char* buff2=(char*)malloc(size2);
+
+		//heap buffer overflow
+		memcpy(buff2,img.data,sizeof(img.data));
+
+		//divide by zero
+		int size3= img.width/img.height;
+		//printf(""Size2:%d"",size3);
+
+		char buff3[10];
+		char* buff4 =(char*)malloc(size3);
+		memcpy(buff4,img.data,sizeof(img.data));
+
+		//OOBR read bytes past stack/heap buffer
+		char OOBR = buff3[size3];
+		char OOBR_heap = buff4[size3];
+
+		//OOBW write bytes past stack/heap buffer
+		buff3[size3]='c';
+		buff4[size3]='c';
+
+		if(size3>10){
+			//memory leak here
+			buff4=0;
+		}
+		else{
+			free(buff4);
+		}
+
+		free(buff2);
+		//}
+		//else
+		//	printf(""invalid header\r\n"");
+
+	}
+	fclose(fp);
+
+	return 0;
+}
+
+int main(int argc,char **argv)
+{
+	ProcessImage(argv[1]);
+
+}
+",True,True
